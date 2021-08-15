@@ -1,0 +1,4 @@
+/loadwep soulrevolver
+/loadwep soulmachinegun
+/loadwep soulshotgun
+/loadwep soulminigun
