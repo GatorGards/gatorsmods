@@ -1,2 +1,0 @@
-/load cow
-/load skull

@@ -1,5 +1,0 @@
-/loadrace cow
-/loadmod cowslct
-/loadwep cowscythe
-/loadwep soulscythe
-/loadmod cowhud

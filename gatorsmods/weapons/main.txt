@@ -1,2 +1,0 @@
-/loadmod gatorweps_master
-/load soul

@@ -1,2 +1,0 @@
-/loadrace skull
-/loadmod skullslct

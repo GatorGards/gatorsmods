@@ -1,3 +1,0 @@
-/load races
-/load weapons
-/loadmod gatorsmods
