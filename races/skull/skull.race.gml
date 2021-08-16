@@ -355,41 +355,6 @@ if wep or bwep != wep_none{
 			}
 		}
 	}
-	else{
-		if my_health >= 3{
-			if(button_check(index, "spec")){
-				cursecharge += 1*current_time_scale
-				sound_play_pitchvol(sndCursedPickup,cursecharge/5, 0.8);
-			
-			if cursecharge >= 50*current_time_scale{
-				sound_play(sndExplosion)
-				repeat(4) with(instance_create(x,y,SmallExplosion)){
-					team = Player.team
-				}
-				
-				my_health -= 2
-				
-				//Delete weapon and autoswitch
-					wep = 0
-					if "bwep" in self{
-						wep = bwep
-						curse = bcurse
-						bwep = 0
-						bcurse = 0
-					}
-					
-				cursecharge = 0
-				}
-			}
-		}
-		else{
-			if(button_pressed(index, "spec")){
-				with(instance_create(x, y, PopupText)){
-					text = ("HP TOO LOW!")
-				}
-			}
-		}
-	}
 }
 
 if(button_released(index, "spec")){
