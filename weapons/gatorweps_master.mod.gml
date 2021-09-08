@@ -10,7 +10,7 @@
 #macro mammo 100
 
 global.soulparticles = sprite_add(cs + ss + "particles.png", 6, 4, 4)
-global.sprsoulproj = sprite_add(cs + ss + "projSoul.png", 1, 6, 6)
+global.sprsoulproj = sprite_add(cs + ss + "projSoulGun.png", 1, 6, 6)
 global.sprsmallsoulexplosion = sprite_add(cs + ss + "smallexplosionSoul.png", 7, 12 ,12)
 
 global.soulammo = 99

@@ -37,8 +37,13 @@ global.sprsit2[1] = sprite_add(s + "sit2B.png", 1, 12, 12);
 
 //Souls
 global.sprsoulidle = sprite_add(ss + "idleSoul.png", 6, 12, 12);
+
 global.sprsoulproj = sprite_add(ss + "projSoul.png", 1, 6, 6)
 global.sprsoulprojcharge = sprite_add(ss + "projSoulCharge.png", 1, 9, 8)
+
+global.sprsoulprojgun = sprite_add(ss + "projSoulGun.png", 1, 6, 6)
+global.sprsoulprojchargegun = sprite_add(ss + "projSoulChargeGun.png", 1, 9, 8)
+
 global.sprsmallsoulexplosion = sprite_add(ss + "smallexplosionSoul.png", 7, 12 ,12)
 global.sprsoulexplosion = sprite_add(ss + "explosionSoul.png", 9, 24, 24)
 global.sprsoulexplosionultra = sprite_add(ss + "explosionSoulUltra.png", 9, 24, 24)
@@ -244,9 +249,9 @@ if(button_pressed(index, "spec")){
 			}
 			
 			if(has_thronebutt){
-				sprite_index = global.sprsoulprojcharge
+				sprite_index = global.sprsoulprojchargegun
 			}
-			else sprite_index = global.sprsoulproj
+			else sprite_index = global.sprsoulprojgun
 		}
 		soulcharge -= 1
 	}
