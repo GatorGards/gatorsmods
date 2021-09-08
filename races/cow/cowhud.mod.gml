@@ -6,33 +6,19 @@ global.sprsoulmetertb = sprite_add(ss + "meterSoulTB.png", 7, 0, 0);
 #define player_hud(_player, _hudIndex, _hudSide)
 switch (_player.race) {
 	case "cow": {
-		if skill_get(mut_throne_butt){
-			draw_sprite_ext(
-				global.sprsoulmetertb,
-				_player.soulcharge,
-				(_hudSide ? 1 : 93),
-				4,
-				(_hudSide ? -1 : 1),
-				1,
-				0,
-				c_white,
-				1
-			);
-		}
-		else{
-			draw_sprite_ext(
-				global.sprsoulmeter,
-				_player.soulcharge,
-				(_hudSide ? 1 : 93),
-				4,
-				(_hudSide ? -1 : 1),
-				1,
-				0,
-				c_white,
-				1
-			);
-		}
+		draw_sprite_ext(
+			(ultra_get("cow", 1) ? global.sprsoulmetertb : global.sprsoulmeter),
+			_player.soulcharge,
+			(_hudSide ? 1 : 93),
+			4,
+			(_hudSide ? -1 : 1),
+			1,
+			0,
+			c_white,
+			1
+		);
 	}
+	break;
 }
 	
 #define draw_gui

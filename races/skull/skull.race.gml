@@ -86,7 +86,12 @@ switch(argument0){
 		case 4: if(mod_exists("mod", "LOMutsSprites")) return `@sNYI`
 }
 
-#define race_name					return (player_get_skin(0) ? "DAMIEN" : "SKULL")
+#define race_name
+switch(player_get_skin(("index" in other) ? other.index : 0)){
+	case 1  : return "DAMIEN";
+	default : return "SKULL";
+}
+
 #define race_text					return `NO CURSE WEAPON DROPS#BUFFED CURSE WEAPONS#CURSE YOUR WEAPON`;
 #define race_skins					return 2;
 #define race_menu_button			sprite_index = global.sprslct;

@@ -11,6 +11,8 @@ race_id = "cow";
 #macro soultimer2 30
 #macro soultimerult 55
 
+#macro has_thronebutt (skill_get(mut_throne_butt))
+
 #macro has_ultra_a (ultra_get(mod_current, 1))
 #macro has_ultra_b (ultra_get(mod_current, 2))
 #macro has_ultra_c (ultra_get(mod_current, 3))
@@ -83,25 +85,30 @@ chargemax = 3;
 switch(argument0){
 		case 1: return "POSSESSION";
 		case 2: return "RESTLESS SPIRITS";
-		case 3: if(mod_exists("mod", "metamorphosis")) return "ULTRA C";
-		case 4: if(mod_exists("mod", "LOMutsSprites")) return "ULTRA D";
+		//case 3: if(mod_exists("mod", "metamorphosis")) return "ULTRA C";
+		//case 4: if(mod_exists("mod", "LOMutsSprites")) return "ULTRA D";
 }
 #define race_ultra_text
 switch(argument0){
-		case 1: return `${soulcolor}SOULS @wTARGET@s#@rENEMIES@s`;
+		case 1: return `@wTHREE @sEXTRA#${soulcolor}SOUL SLOTS`;
 		case 2: return `${soulcolor}SOULS@s @wIMMEDIATELY@s FLY AWAY#${soulcolor}SOUL EXPLOSIONS@s DROP ${soulcolor}SOULS@s`;
-		case 3: if(mod_exists("mod", "metamorphosis")) return `@sNYI`
-		case 4: if(mod_exists("mod", "LOMutsSprites")) return `@sNYI`
+		//case 3: if(mod_exists("mod", "metamorphosis")) return `@sNYI`
+		//case 4: if(mod_exists("mod", "LOMutsSprites")) return `@sNYI`
 }
 
-#define race_name					return (player_get_skin(0) ? "CLAIRE" : "COW")
+#define race_name
+switch(player_get_skin(("index" in other) ? other.index : 0)){
+	case 1  : return "CLAIRE";
+	default : return "COW";
+}
+
 #define race_text					return `LESS MAX @rHP#${soulcolor}SOUL @wEXTRACTION#${soulcolor}SOUL @wMANIPULATION`;
 #define race_skins					return 2;
 #define race_menu_button			sprite_index = global.sprslct;
 #define race_mapicon				return global.sprmapico;
 #define race_portrait				return global.sprport;
 #define race_skin_button			sprite_index = global.sprskin image_index = argument0;
-#define race_tb_text				return `@wTHREE @sEXTRA#${soulcolor}SOUL SLOTS`
+#define race_tb_text				return `${soulcolor}SOULS @wTARGET@s#@rENEMIES@s`
 #define race_ultra_button			sprite_index = global.sprultr; image_index = argument0-1; image_speed = 0
 #define race_ultra_icon 			return global.sprulti[argument0-1]
 #define race_soundbank				return "rebel";
@@ -143,6 +150,110 @@ switch(player_get_skin(("index" in other) ? other.index : 0)){
 }
 
 #define step
+//#region PASSIVE(S)
+//Soul Spawning (PASSIVE)
+if(instance_exists(enemy)){
+	with(instances_matching_le(enemy, "my_health", 0)){
+		if("soulextra" in self){
+			if random(5) < 1{
+				if(has_ultra_b){
+					repeat(soulextra) with(soulproj_create(x,y,true)){
+						if (has_ultra_b){
+							sprite_index = global.sprsoulprojcharge
+						}
+						else sprite_index = global.sprsoulproj
+					}
+				}
+			}
+			else if(!has_ultra_b) if(random(5) < 1) repeat(soulextra) soul_create(x,y);
+		}
+		else{
+			if(has_ultra_b){
+				if random(5) < 1{
+					with(soulproj_create(x,y,true)){
+						if(has_ultra_b){
+							sprite_index = global.sprsoulprojcharge
+						}
+						else sprite_index = global.sprsoulproj
+					}
+				}
+			}
+			else if(!has_ultra_b) if(random(5) < 1) soul_create(x,y);
+		}
+	}
+}
+//#endregion
+
+//#region ACTIVE
+if has_ultra_a{
+	chargemax = 6
+}
+else chargemax = 3
+
+if soulcharge < chargemax{
+	soultemp += current_time_scale
+}
+	
+if(soultemp > chargespeed*current_time_scale){
+	soultemp = 0
+	souldiff = soulcharge
+	soulcharge++;
+}
+	
+else if soulcharge >= chargemax{
+	soulcharge = chargemax
+}
+	
+if souldiff != soulcharge{
+	sound_play_pitch(sndCursedPickup, 1.4 + random(0.4));
+	
+	with(instance_create(x, y, ChickenB)) {
+		depth = depth - 1;
+		image_speed = 0.5;
+	}
+	souldiff = soulcharge
+}
+	
+if(soulcharge = 3){
+	if random(2) < 1 with(instance_create(x,y,Curse)){
+		sprite_index = global.soulparticles
+	}
+}
+
+if(button_pressed(index, "spec")){
+	if(soulcharge > 0){
+		with(soulproj_create(x+lengthdir_x(5,gunangle),y+lengthdir_y(5,gunangle),false)){
+			maxspeed = 25;
+			turnspeed = 40;
+			
+			creator = Player;
+			
+			wallthrough = false;
+			tt = 6;
+			strtdir = other.gunangle;
+			direction = other.gunangle;
+			explodamage = 3;
+			
+			if(has_thronebutt and instance_exists(enemy)){
+				msx = instance_nearest(x,y,enemy).x
+				msy = instance_nearest(x,y,enemy).y
+			}
+			else{
+				msx = mouse_x
+				msy = mouse_y
+			}
+			
+			if(has_thronebutt){
+				sprite_index = global.sprsoulprojcharge
+			}
+			else sprite_index = global.sprsoulproj
+		}
+		soulcharge -= 1
+	}
+}
+
+//#endregion
+
 //#region HORN (B)
 if(button_pressed(index,"horn")){
 	with(instance_create(x, y, PopupText)){
@@ -325,109 +436,6 @@ if(button_pressed(index,"horn")){
 
 //#endregion
 
-//#region PASSIVE(S)
-//Soul Spawning (PASSIVE)
-if(instance_exists(enemy)){
-	with(instances_matching_le(enemy, "my_health", 0)){
-		if("soulextra" in self){
-			if random(5) < 1{
-				if(has_ultra_b){
-					repeat(soulextra) with(soulproj_create(x,y,true)){
-						if (has_ultra_b){
-							sprite_index = global.sprsoulprojcharge
-						}
-						else sprite_index = global.sprsoulproj
-					}
-				}
-			}
-			else if(!has_ultra_b) if(random(5) < 1) repeat(soulextra) soul_create(x,y);
-		}
-		else{
-			if(has_ultra_b){
-				if random(5) < 1{
-					with(soulproj_create(x,y,true)){
-						if(has_ultra_b){
-							sprite_index = global.sprsoulprojcharge
-						}
-						else sprite_index = global.sprsoulproj
-					}
-				}
-			}
-			else if(!has_ultra_b) if(random(5) < 1) soul_create(x,y);
-		}
-	}
-}
-//#endregion
-
-//#region ACTIVE
-if skill_get(mut_throne_butt){
-	chargemax = 6
-}
-else chargemax = 3
-
-if soulcharge < chargemax{
-	soultemp += current_time_scale
-}
-	
-if(soultemp > chargespeed*current_time_scale){
-	soultemp = 0
-	souldiff = soulcharge
-	soulcharge++;
-}
-	
-else if soulcharge >= chargemax{
-	soulcharge = chargemax
-}
-	
-if souldiff != soulcharge{
-	sound_play_pitch(sndCursedPickup, 1.4 + random(0.4));
-	
-	with(instance_create(x, y, ChickenB)) {
-		depth = depth - 1;
-		image_speed = 0.5;
-	}
-	souldiff = soulcharge
-}
-	
-if(soulcharge = 3){
-	if random(2) < 1 with(instance_create(x,y,Curse)){
-		sprite_index = global.soulparticles
-	}
-}
-
-if(button_pressed(index, "spec")){
-	if(soulcharge > 0){
-		with(soulproj_create(x+lengthdir_x(5,gunangle),y+lengthdir_y(5,gunangle),false)){
-			maxspeed = 25;
-			turnspeed = 40;
-			
-			creator = Player;
-			
-			wallthrough = false;
-			tt = 6;
-			strtdir = other.gunangle;
-			direction = other.gunangle;
-			explodamage = 3;
-			
-			if(has_ultra_a and instance_exists(enemy)){
-				msx = instance_nearest(x,y,enemy).x
-				msy = instance_nearest(x,y,enemy).y
-			}
-			else{
-				msx = mouse_x
-				msy = mouse_y
-			}
-			
-			if(has_ultra_a){
-				sprite_index = global.sprsoulprojcharge
-			}
-			else sprite_index = global.sprsoulproj
-		}
-		soulcharge -= 1
-	}
-}
-
-//#endregion
 #define soul_create(_x,_y)
 if instance_exists(Player){
 	with(instance_create(x+random_range(-15,15), y+random_range(-15,15), CustomObject)){
@@ -454,7 +462,7 @@ if instance_exists(Player){
 		soulproj_create(x,y,false)
 		instance_delete(self);
 	}
-#define soulproj_create(_x,_y,_ultrad)
+#define soulproj_create(_x,_y,_thronebuttd)
 if instance_exists(Player){
 with(instance_create(_x,_y,CustomProjectile)){
 	//These are all default, you can change them in with()
@@ -476,7 +484,7 @@ with(instance_create(_x,_y,CustomProjectile)){
 	strtdir = random(360);
 	turnspeed = 25;
 	
-	if(has_ultra_a and instance_exists(enemy)){
+	if(has_thronebutt and instance_exists(enemy)){
 		msx = instance_nearest(x,y,enemy).x
 		msy = instance_nearest(x,y,enemy).y
 	}
@@ -489,7 +497,7 @@ with(instance_create(_x,_y,CustomProjectile)){
 	dircorrect = false;
 	
 	image_angle = direction
-	ultrad = _ultrad
+	thronebuttd = _thronebuttd
 	wallthrough = true
 	
 	soul_on_hit = 0;
@@ -558,7 +566,7 @@ if(dircorrect == true and wallthrough == false){
 
 //Soul Hit
 if(soul_on_hit == 1){
-	if(ultrad = true and has_ultra_b){
+	if(thronebuttd = true and has_ultra_b){
 		soul_create(x,y)
 	}
 	soulproj_destroy();
